@@ -6,9 +6,7 @@ export async function getArticles() {
     .from("articulos")
     .select(`*,
       agrupadores:fk_id_agrupador(nombre),
-      marcas:fk_id_marca(descripcion),
-      talles:fk_id_talle(descripcion),
-      color:fk_id_color(descripcion)
+      marcas:fk_id_marca(descripcion)
     `)
     .order("id", { ascending: false });
   if (error) throw error;
@@ -17,8 +15,6 @@ export async function getArticles() {
     ...(a as Record<string, unknown>),
     agrupador_nombre: (a as any).agrupadores?.nombre || '',
     marca_nombre: (a as any).marcas?.descripcion || '',
-    talle_descripcion: (a as any).talles?.descripcion || '',
-    color_descripcion: (a as any).color?.descripcion || '',
   }));
   return mapped as Article[];
 }

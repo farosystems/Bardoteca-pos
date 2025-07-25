@@ -18,8 +18,6 @@ import { Input } from "@/components/ui/input";
 import { Article, CreateArticleData, UpdateArticleData } from "@/types/article";
 import { useAgrupadores } from "@/hooks/use-agrupadores";
 import { useMarcas } from "@/hooks/use-marcas";
-import { useTalles } from "@/hooks/use-talles";
-import { useColores } from "@/hooks/use-colores";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useTrialCheck } from "@/hooks/use-trial-check";
 import { createMovimientoStock } from "@/services/movimientosStock";
@@ -47,8 +45,6 @@ interface ArticleFormProps {
 export function ArticleForm({ article, onSave, onCancel, isLoading = false }: ArticleFormProps) {
   const { agrupadores } = useAgrupadores();
   const { marcas } = useMarcas();
-  const { talles } = useTalles();
-  const { colores } = useColores();
   const form = useForm({
     resolver: zodResolver(articleSchema),
     defaultValues: {
@@ -207,9 +203,9 @@ export function ArticleForm({ article, onSave, onCancel, isLoading = false }: Ar
                     onChange={e => field.onChange(e.target.value ? Number(e.target.value) : null)}
                   >
                     <option value="">Sin talle</option>
-                    {talles.map((talle) => (
+                    {/* {talles.map((talle) => (
                       <option key={talle.id} value={talle.id}>{talle.descripcion}</option>
-                    ))}
+                    ))} */}
                   </select>
                 </FormControl>
                 <FormDescription>Selecciona el talle del artículo</FormDescription>
@@ -230,9 +226,9 @@ export function ArticleForm({ article, onSave, onCancel, isLoading = false }: Ar
                     onChange={e => field.onChange(e.target.value ? Number(e.target.value) : null)}
                   >
                     <option value="">Sin color</option>
-                    {colores.map((color) => (
+                    {/* {colores.map((color) => (
                       <option key={color.id} value={color.id}>{color.descripcion}</option>
-                    ))}
+                    ))} */}
                   </select>
                 </FormControl>
                 <FormDescription>Selecciona el color del artículo</FormDescription>

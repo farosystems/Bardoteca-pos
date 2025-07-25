@@ -186,16 +186,6 @@ export function AppSidebar() {
                     <span>Productos</span>
                   </Link>
                 </li>
-                <li className={`${pathname === "/talles-colores" ? "border-l-4 border-blue-600 bg-blue-50" : ""} pl-2`}>
-                  <Link
-                    href="/talles-colores"
-                    className={`flex items-center gap-3 px-4 py-2 rounded-md transition-colors ${pathname === "/talles-colores" ? "text-blue-800 font-semibold" : "hover:bg-gray-100 text-black"}`}
-                    prefetch={false}
-                  >
-                    <IconPalette className="w-4 h-4" />
-                    <span>Talles y colores</span>
-                  </Link>
-                </li>
                 <li className={`${pathname === "/movimientos-stock" ? "border-l-4 border-blue-600 bg-blue-50" : ""} pl-2`}>
                   <Link
                     href="/movimientos-stock"

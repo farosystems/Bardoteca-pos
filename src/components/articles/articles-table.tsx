@@ -90,16 +90,6 @@ export function ArticlesTable({ data, onEdit }: ArticlesTableProps) {
       cell: ({ row }) => <div>{row.getValue("marca_nombre") || "-"}</div>,
     },
     {
-      accessorKey: "talle_descripcion",
-      header: "Talle",
-      cell: ({ row }) => <div>{row.getValue("talle_descripcion") || "-"}</div>,
-    },
-    {
-      accessorKey: "color_descripcion",
-      header: "Color",
-      cell: ({ row }) => <div>{row.getValue("color_descripcion") || "-"}</div>,
-    },
-    {
       id: "actions",
       header: "Acciones",
       cell: ({ row }) => (
