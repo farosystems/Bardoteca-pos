@@ -429,9 +429,12 @@ export function VentaFormDialog({ open, onOpenChange, onVentaGuardada }: VentaFo
       onOpenChange(false);
       showToast("Venta registrada con éxito");
       // Opcional: mostrar toast de éxito
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error("Error al guardar la venta:", e);
-      setError(e?.message || e?.error_description || "Error al guardar la venta");
+      const errorMessage = e instanceof Error ? e.message : 
+                          typeof e === 'object' && e !== null && 'error_description' in e ? 
+                          String(e.error_description) : "Error al guardar la venta";
+      setError(errorMessage);
     }
     setLoading(false);
   }
@@ -463,6 +466,31 @@ export function VentaFormDialog({ open, onOpenChange, onVentaGuardada }: VentaFo
     : usuarioActual
       ? usuarios.filter(u => u.email === usuarioActual.email)
       : [];
+
+  // Al inicio del componente VentaFormDialog, antes del render:
+  const HEADERS_KEY = 'articulos_table_headers';
+  const defaultPrecioLabels = {
+    labelPrecioUnitario: 'Precio 1',
+    labelPrecio2: 'Precio 2',
+    labelPrecio3: 'Precio 3',
+    labelPrecio4: 'Precio 4',
+  };
+  
+  let precioLabels = { ...defaultPrecioLabels };
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem(HEADERS_KEY);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        precioLabels = {
+          labelPrecioUnitario: parsed.labelPrecioUnitario || defaultPrecioLabels.labelPrecioUnitario,
+          labelPrecio2: parsed.labelPrecio2 || defaultPrecioLabels.labelPrecio2,
+          labelPrecio3: parsed.labelPrecio3 || defaultPrecioLabels.labelPrecio3,
+          labelPrecio4: parsed.labelPrecio4 || defaultPrecioLabels.labelPrecio4,
+        };
+      } catch {}
+    }
+  }
 
   return (
     <>
@@ -585,14 +613,27 @@ export function VentaFormDialog({ open, onOpenChange, onVentaGuardada }: VentaFo
                           />
                         </td>
                         <td className="px-2 py-1">
-                          <input
-                            type="number"
-                            min={0}
-                            className="w-24 border rounded px-2 py-1"
-                            value={d.precio}
-                            onChange={e => handleDetalleChange(idx, "precio", e.target.value)}
-                            disabled={!d.articulo}
-                          />
+                          {d.articulo ? (
+                            <select
+                              className="w-24 border rounded px-2 py-1"
+                              value={d.precio}
+                              onChange={e => handleDetalleChange(idx, "precio", Number(e.target.value))}
+                            >
+                              <option value={d.articulo.precio_unitario}>{precioLabels.labelPrecioUnitario}: {formatCurrency(d.articulo.precio_unitario, DEFAULT_CURRENCY, DEFAULT_LOCALE)}</option>
+                              <option value={d.articulo.precio_2}>{precioLabels.labelPrecio2}: {formatCurrency(d.articulo.precio_2, DEFAULT_CURRENCY, DEFAULT_LOCALE)}</option>
+                              <option value={d.articulo.precio_3}>{precioLabels.labelPrecio3}: {formatCurrency(d.articulo.precio_3, DEFAULT_CURRENCY, DEFAULT_LOCALE)}</option>
+                              <option value={d.articulo.precio_4}>{precioLabels.labelPrecio4}: {formatCurrency(d.articulo.precio_4, DEFAULT_CURRENCY, DEFAULT_LOCALE)}</option>
+                            </select>
+                          ) : (
+                            <input
+                              type="number"
+                              min={0}
+                              className="w-24 border rounded px-2 py-1"
+                              value={d.precio}
+                              onChange={e => handleDetalleChange(idx, "precio", e.target.value)}
+                              disabled={!d.articulo}
+                            />
+                          )}
                         </td>
                         <td className="px-2 py-1">{formatCurrency(d.subtotal, DEFAULT_CURRENCY, DEFAULT_LOCALE)}</td>
                         <td className="px-2 py-1">

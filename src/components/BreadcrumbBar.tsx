@@ -24,6 +24,7 @@ export function BreadcrumbBar() {
     "dashboard": { menu: "Dashboard", submenu: "Dashboard" },
     "liquidaciones": { menu: "Sueldos", submenu: "Liquidaciones" },
     "empleados": { menu: "Sueldos", submenu: "Empleados" },
+    "asistente-ai": { menu: "Faro", submenu: "Asistente IA" },
   };
   const last = parts[parts.length - 1];
   const info = routeMap[last] || null;

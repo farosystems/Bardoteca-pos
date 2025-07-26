@@ -2,6 +2,9 @@ export interface Article {
   id: number;
   descripcion: string;
   precio_unitario: number;
+  precio_2: number;
+  precio_3: number;
+  precio_4: number;
   fk_id_agrupador: number;
   fk_id_marca: number | null;
   activo: boolean;

@@ -33,11 +33,14 @@ import {
 } from "@/components/ui/table";
 import { Article } from "@/types/article";
 import { formatCurrency, DEFAULT_CURRENCY, DEFAULT_LOCALE } from "@/lib/utils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose, DialogTrigger } from "@/components/ui/dialog";
 
 interface ArticlesTableProps {
   data: Article[];
   onEdit?: (article: Article) => void;
 }
+
+const HEADERS_KEY = 'articulos_table_headers';
 
 export function ArticlesTable({ data, onEdit }: ArticlesTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -45,33 +48,94 @@ export function ArticlesTable({ data, onEdit }: ArticlesTableProps) {
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
+  // 2. Estado para abrir/cerrar el dialog
+  const [openEditHeaders, setOpenEditHeaders] = React.useState(false);
+  // 3. Estado para los labels editables de todas las columnas
+  const initialHeaders = getInitialHeaders();
+
+  function getInitialHeaders() {
+    if (typeof window === 'undefined') return {};
+    const saved = localStorage.getItem(HEADERS_KEY);
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {}
+    }
+    return {};
+  }
+
+  // Declarar correctamente los useState para los labels:
+  const [labelCodigo, setLabelCodigo] = React.useState(initialHeaders.labelCodigo || "Código");
+  const [labelDescripcion, setLabelDescripcion] = React.useState(initialHeaders.labelDescripcion || "Descripción");
+  const [labelPrecioUnitario, setLabelPrecioUnitario] = React.useState(initialHeaders.labelPrecioUnitario || "Precio Unitario");
+  const [labelPrecio2, setLabelPrecio2] = React.useState(initialHeaders.labelPrecio2 || "Precio 2");
+  const [labelPrecio3, setLabelPrecio3] = React.useState(initialHeaders.labelPrecio3 || "Precio 3");
+  const [labelPrecio4, setLabelPrecio4] = React.useState(initialHeaders.labelPrecio4 || "Precio 4");
+  const [labelAgrupador, setLabelAgrupador] = React.useState(initialHeaders.labelAgrupador || "Agrupador");
+  const [labelActivo, setLabelActivo] = React.useState(initialHeaders.labelActivo || "Activo");
+  const [labelStock, setLabelStock] = React.useState(initialHeaders.labelStock || "Stock");
+  const [labelMarca, setLabelMarca] = React.useState(initialHeaders.labelMarca || "Marca");
+
+  // Guardar encabezados personalizados en localStorage cada vez que cambian
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const toSave = {
+      labelCodigo,
+      labelDescripcion,
+      labelPrecioUnitario,
+      labelPrecio2,
+      labelPrecio3,
+      labelPrecio4,
+      labelAgrupador,
+      labelActivo,
+      labelStock,
+      labelMarca,
+    };
+    localStorage.setItem(HEADERS_KEY, JSON.stringify(toSave));
+  }, [labelCodigo, labelDescripcion, labelPrecioUnitario, labelPrecio2, labelPrecio3, labelPrecio4, labelAgrupador, labelActivo, labelStock, labelMarca]);
+
   const columns: ColumnDef<Article>[] = [
     {
       accessorKey: "id",
-      header: "Código",
+      header: labelCodigo,
       cell: ({ row }) => <div>{row.getValue("id")}</div>,
     },
     {
       accessorKey: "descripcion",
-      header: "Descripción",
+      header: labelDescripcion,
       cell: ({ row }) => <div>{row.getValue("descripcion")}</div>,
     },
     {
       accessorKey: "precio_unitario",
-      header: "Precio Unitario",
+      header: labelPrecioUnitario,
       cell: ({ row }) => {
         const price = parseFloat(row.getValue("precio_unitario"));
         return <div className="font-medium">{formatCurrency(price, DEFAULT_CURRENCY, DEFAULT_LOCALE)}</div>;
       },
     },
     {
+      accessorKey: "precio_2",
+      header: labelPrecio2,
+      cell: ({ row }) => <div>{row.getValue("precio_2")}</div>,
+    },
+    {
+      accessorKey: "precio_3",
+      header: labelPrecio3,
+      cell: ({ row }) => <div>{row.getValue("precio_3")}</div>,
+    },
+    {
+      accessorKey: "precio_4",
+      header: labelPrecio4,
+      cell: ({ row }) => <div>{row.getValue("precio_4")}</div>,
+    },
+    {
       accessorKey: "agrupador_nombre",
-      header: "Agrupador",
+      header: labelAgrupador,
       cell: ({ row }) => <div>{row.getValue("agrupador_nombre")}</div>,
     },
     {
       accessorKey: "activo",
-      header: "Activo",
+      header: labelActivo,
       cell: ({ row }) => (
         <span className={row.getValue("activo") ? "text-green-600" : "text-red-600"}>
           {row.getValue("activo") ? "Sí" : "No"}
@@ -81,12 +145,12 @@ export function ArticlesTable({ data, onEdit }: ArticlesTableProps) {
     // Nueva columna para stock
     {
       accessorKey: "stock",
-      header: "Stock",
+      header: labelStock,
       cell: ({ row }) => <div>{row.getValue("stock")}</div>,
     },
     {
       accessorKey: "marca_nombre",
-      header: "Marca",
+      header: labelMarca,
       cell: ({ row }) => <div>{row.getValue("marca_nombre") || "-"}</div>,
     },
     {
@@ -164,6 +228,63 @@ export function ArticlesTable({ data, onEdit }: ArticlesTableProps) {
               })}
           </DropdownMenuContent>
         </DropdownMenu>
+        <Dialog open={openEditHeaders} onOpenChange={setOpenEditHeaders}>
+          <DialogTrigger asChild>
+            <Button variant="outline" className="ml-2">Editar encabezados <Edit className="ml-2 h-4 w-4" /></Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Editar nombres de columnas</DialogTitle>
+            </DialogHeader>
+            <div className="flex flex-col gap-3 py-2">
+              <label>
+                Código
+                <input className="border rounded px-2 py-1 w-full" value={labelCodigo} onChange={e => setLabelCodigo(e.target.value)} />
+              </label>
+              <label>
+                Descripción
+                <input className="border rounded px-2 py-1 w-full" value={labelDescripcion} onChange={e => setLabelDescripcion(e.target.value)} />
+              </label>
+              <label>
+                Precio Unitario
+                <input className="border rounded px-2 py-1 w-full" value={labelPrecioUnitario} onChange={e => setLabelPrecioUnitario(e.target.value)} />
+              </label>
+              <label>
+                Precio 2
+                <input className="border rounded px-2 py-1 w-full" value={labelPrecio2} onChange={e => setLabelPrecio2(e.target.value)} />
+              </label>
+              <label>
+                Precio 3
+                <input className="border rounded px-2 py-1 w-full" value={labelPrecio3} onChange={e => setLabelPrecio3(e.target.value)} />
+              </label>
+              <label>
+                Precio 4
+                <input className="border rounded px-2 py-1 w-full" value={labelPrecio4} onChange={e => setLabelPrecio4(e.target.value)} />
+              </label>
+              <label>
+                Agrupador
+                <input className="border rounded px-2 py-1 w-full" value={labelAgrupador} onChange={e => setLabelAgrupador(e.target.value)} />
+              </label>
+              <label>
+                Activo
+                <input className="border rounded px-2 py-1 w-full" value={labelActivo} onChange={e => setLabelActivo(e.target.value)} />
+              </label>
+              <label>
+                Stock
+                <input className="border rounded px-2 py-1 w-full" value={labelStock} onChange={e => setLabelStock(e.target.value)} />
+              </label>
+              <label>
+                Marca
+                <input className="border rounded px-2 py-1 w-full" value={labelMarca} onChange={e => setLabelMarca(e.target.value)} />
+              </label>
+            </div>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="default">Cerrar</Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
       <div className="rounded-md border">
         <Table>

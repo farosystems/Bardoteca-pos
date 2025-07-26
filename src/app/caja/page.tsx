@@ -247,8 +247,8 @@ export default function CajaPage() {
     const now = new Date();
     const hoy = format(now, "yyyy-MM-dd");
     try {
-      // Buscar la caja por descripción
-      const cajaObj = cajas.find(c => c.descripcion === cajaSeleccionada);
+      // Buscar la caja por id
+      const cajaObj = cajas.find(c => c.id === Number(cajaSeleccionada));
       if (!cajaObj) throw new Error("Caja no encontrada");
       // Crear lote de apertura
       const lote = await createLoteOperacion({
@@ -825,9 +825,13 @@ export default function CajaPage() {
                 value={usuarioSeleccionado}
                 onChange={e => setUsuarioSeleccionado(e.target.value)}
               >
-                {usuarios.map((usuario) => (
-                  <option key={usuario.id} value={usuario.id.toString()}>{usuario.nombre}</option>
-                ))}
+                {usuarioDB?.rol === "cobrador"
+                  ? usuarioActual && (
+                      <option key={usuarioActual.id} value={usuarioActual.id.toString()}>{usuarioActual.nombre}</option>
+                    )
+                  : usuarios.map((usuario) => (
+                      <option key={usuario.id} value={usuario.id.toString()}>{usuario.nombre}</option>
+                    ))}
               </select>
             </div>
             <div className="flex items-end">

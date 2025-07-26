@@ -25,7 +25,6 @@ import { CuentaTesoreria } from "@/types/cuentaTesoreria";
 import { CreateLiquidacionData } from "@/types/liquidacion";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { createDetalleLoteOperacion } from "@/services/detalleLotesOperaciones";
 
 export function LiquidacionForm({ onLiquidacionGuardada }: { onLiquidacionGuardada: () => void }) {
   const [empleados, setEmpleados] = useState<Empleado[]>([]);
@@ -36,7 +35,16 @@ export function LiquidacionForm({ onLiquidacionGuardada }: { onLiquidacionGuarda
   const [error, setError] = useState<string | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
-  const [liquidatedData, setLiquidatedData] = useState<any>(null);
+  const [liquidatedData, setLiquidatedData] = useState<{
+    empleado: Empleado;
+    desde: Date | string;
+    hasta: Date | string;
+    fecha_liquidacion: Date | string;
+    sueldo_base: number;
+    total_adelantos: number;
+    total_faltas: number;
+    neto_liquidado: number;
+  } | null>(null);
   const [showConfirmGastoModal, setShowConfirmGastoModal] = useState(false);
   const [pendingLiquidacion, setPendingLiquidacion] = useState<{ liquidacion: CreateLiquidacionData, empleado: Empleado } | null>(null);
   const [sueldoTipoGastoId, setSueldoTipoGastoId] = useState<number | null>(null);
@@ -236,13 +244,6 @@ export function LiquidacionForm({ onLiquidacionGuardada }: { onLiquidacionGuarda
                 fk_cuenta_tesoreria: cuentaParaGasto,
                 fk_usuario: 1,
             });
-            // Registrar egreso en detalle_lotes_operaciones
-            await createDetalleLoteOperacion({
-                fk_id_lote: loteAbierto,
-                fk_id_cuenta_tesoreria: cuentaParaGasto,
-                tipo: 'egreso',
-                monto: liquidacion.neto_liquidado,
-            });
         }
         
         setLiquidatedData({ ...liquidacion, empleado, fecha_liquidacion: new Date() });
@@ -258,7 +259,16 @@ export function LiquidacionForm({ onLiquidacionGuardada }: { onLiquidacionGuarda
     }
   };
   
-  const generarPDF = (data: any) => {
+  const generarPDF = (data: {
+    empleado: Empleado;
+    desde: Date | string;
+    hasta: Date | string;
+    fecha_liquidacion: Date | string;
+    sueldo_base: number;
+    total_adelantos: number;
+    total_faltas: number;
+    neto_liquidado: number;
+  }) => {
     const doc = new jsPDF();
     doc.setFontSize(18);
     doc.text("Recibo de Sueldo", 105, 20, { align: "center" });

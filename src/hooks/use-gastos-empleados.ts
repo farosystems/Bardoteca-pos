@@ -15,8 +15,9 @@ export function useGastosEmpleados(tiposGasto: TipoGasto[]) {
     try {
       const data = await getGastosEmpleados();
       setGastos(data);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -48,8 +49,9 @@ export function useGastosEmpleados(tiposGasto: TipoGasto[]) {
           monto: data.monto,
         });
       }
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

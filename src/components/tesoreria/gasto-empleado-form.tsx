@@ -30,6 +30,7 @@ import { CuentaTesoreria } from "@/types/cuentaTesoreria";
 import { CreateGastoEmpleadoData } from "@/types/gastoEmpleado";
 import { Usuario } from "@/types/usuario";
 import { createDetalleLoteOperacion } from "@/services/detalleLotesOperaciones";
+import { useUser } from "@clerk/nextjs";
 
 function formatNumberWithCommas(value: string): string {
   if (!value) return "";
@@ -46,6 +47,7 @@ interface GastoEmpleadoFormProps {
 }
 
 export function GastoEmpleadoForm({ onSubmit, onCancel, isLoading = false }: GastoEmpleadoFormProps) {
+  const { user } = useUser();
   const [form, setForm] = useState<any>({
     monto: 0,
     fk_lote_operaciones: null,
@@ -147,6 +149,9 @@ export function GastoEmpleadoForm({ onSubmit, onCancel, isLoading = false }: Gas
     calcularTope();
   }, [form.fk_empleado, form.fk_tipo_gasto, empleados, tiposGasto]);
 
+  // Filtrar usuarios para mostrar solo el logueado
+  const usuarioLogueado = usuarios.find(u => u.email === user?.emailAddresses?.[0]?.emailAddress);
+
   // Formateo en tiempo real del campo monto
   const handleMontoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value.replace(/\./g, "").replace(/,/g, ".");
@@ -179,9 +184,9 @@ export function GastoEmpleadoForm({ onSubmit, onCancel, isLoading = false }: Gas
       return;
     }
     await onSubmit(form as CreateGastoEmpleadoData);
-    // Si el tipo de gasto afecta caja, registrar egreso en detalle_lotes_operaciones
+    // Si el tipo de gasto afecta caja y NO es adelanto, registrar egreso en detalle_lotes_operaciones
     const tipoGasto = tiposGasto.find((t: TipoGasto) => t.id === form.fk_tipo_gasto);
-    if (tipoGasto && tipoGasto.afecta_caja) {
+    if (tipoGasto && tipoGasto.afecta_caja && tipoGasto.descripcion?.toLowerCase() !== 'adelanto') {
       await createDetalleLoteOperacion({
         fk_id_lote: lote!,
         fk_id_cuenta_tesoreria: form.fk_cuenta_tesoreria,
@@ -282,9 +287,9 @@ export function GastoEmpleadoForm({ onSubmit, onCancel, isLoading = false }: Gas
                    <SelectValue placeholder="Seleccionar usuario" />
                </SelectTrigger>
                <SelectContent>
-                   {usuarios.map((u: Usuario) => (
-                       <SelectItem key={u.id} value={String(u.id)}>{u.nombre}</SelectItem>
-                   ))}
+                   {usuarioLogueado && (
+                       <SelectItem key={usuarioLogueado.id} value={String(usuarioLogueado.id)}>{usuarioLogueado.nombre}</SelectItem>
+                   )}
                </SelectContent>
            </Select>
         </div>

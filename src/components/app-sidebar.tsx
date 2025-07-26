@@ -10,7 +10,7 @@ import {
   IconUsers,
   IconReceipt,
   IconCalculator,
-  IconPalette,
+  IconRobot,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
@@ -258,26 +258,7 @@ export function AppSidebar() {
                     <span>Ventas</span>
                   </Link>
                 </li>
-                <li className={`${pathname === "/cuentas-corrientes" ? "border-l-4 border-blue-600 bg-blue-50" : ""} pl-2`}>
-                  <Link
-                    href="/cuentas-corrientes"
-                    className={`flex items-center gap-3 px-4 py-2 rounded-md transition-colors ${pathname === "/cuentas-corrientes" ? "text-blue-800 font-semibold" : "hover:bg-gray-100 text-black"}`}
-                    prefetch={false}
-                  >
-                    <IconCash className="w-4 h-4" />
-                    <span>Cuentas corrientes</span>
-                  </Link>
-                </li>
-                <li className={`${pathname === "/pagos" ? "border-l-4 border-blue-600 bg-blue-50" : ""} pl-2`}>
-                  <Link
-                    href="/pagos"
-                    className={`flex items-center gap-3 px-4 py-2 rounded-md transition-colors ${pathname === "/pagos" ? "text-blue-800 font-semibold" : "hover:bg-gray-100 text-black"}`}
-                    prefetch={false}
-                  >
-                    <IconCash className="w-4 h-4" />
-                    <span>Pagos</span>
-                  </Link>
-                </li>
+
               </ul>
             )}
           </li>
@@ -355,6 +336,17 @@ export function AppSidebar() {
               )}
             </li>
           )}
+          {/* Item Asistente AI */}
+          <li>
+            <Link
+              href="/asistente-ai"
+              className={`flex items-center gap-3 px-4 py-2 rounded-md transition-colors ${pathname === "/asistente-ai" ? "bg-gray-200 text-black font-semibold w-[92%] ml-1" : "hover:bg-gray-100 text-black"}`}
+              prefetch={false}
+            >
+              <IconRobot className="w-5 h-5" />
+              <span>Asistente AI</span>
+            </Link>
+          </li>
         </ul>
       </nav>
       <div className="mt-auto p-4 flex flex-col items-start gap-2">
